@@ -1,3 +1,7 @@
 .venv
 .minivenv
 __pycache__
+.ipynb_checkpoints
+models
+openvino_notebooks
+*.mp4
