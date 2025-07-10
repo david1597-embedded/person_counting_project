@@ -1,0 +1,9 @@
+openvino>=2024.0.0
+opencv-python
+matplotlib
+requests
+jupyter
+ultralytics==8.3.59
+lap>=0.4
+shapely
+torch>=2.1 --extra-index-url https://download.pytorch.org/whl/cpu
