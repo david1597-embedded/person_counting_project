@@ -39,66 +39,78 @@ class PersonCounter:
         self.compiled_model.track = self.counter.model.track
         self.counter.model = self.compiled_model
 
+    def counting_person(self):
+        start_time = time.time()
+
+        # === line cross counter ===
+        # self.frame = self.counter.count(self.frame)
+
+        # === frame exist counter ===
+        results = self.det_model(self.frame)
+        self.frame = results[0].plot()
+
+        stop_time = time.time()
+
+        self.processing_times.append(stop_time - start_time)
+
+        # Mean processing time [ms].
+        _, f_width = self.frame.shape[:2]
+        processing_time = np.mean(self.processing_times) * 1000
+        fps = 1000 / processing_time
+        cv2.putText(
+            img=self.frame,
+            text=f"Inference time: {processing_time:.1f}ms ({fps:.1f} FPS)",
+            org=(20, 40),
+            fontFace=cv2.FONT_HERSHEY_COMPLEX,
+            fontScale=f_width / 1000,
+            color=(0, 0, 255),
+            thickness=2,
+            lineType=cv2.LINE_AA,
+        )
+
+        # Get the counts. Counts are getting as 'OUT'
+        # Modify this logic accordingly
+    
+        # counts = self.counter.out_count
+        counts = sum(1 for c in results[0].boxes.cls if int(c) == 0)
+
+        # Define the text to display
+        text = f"Count: {counts}"
+        fontFace = cv2.FONT_HERSHEY_COMPLEX
+        fontScale = 0.75  # Adjust scale as needed
+        thickness = 2
+
+        # Calculate the size of the text box
+        (text_width, text_height), _ = cv2.getTextSize(text, fontFace, fontScale, thickness)
+
+        # Define the upper right corner for the text
+        top_right_corner = (self.frame.shape[1] - text_width - 20, 40)
+        # Draw the count of "OUT" on the frame
+        cv2.putText(
+            img=self.frame,
+            text=text,
+            org=(top_right_corner[0], top_right_corner[1]),
+            fontFace=fontFace,
+            fontScale=fontScale,
+            color=(0, 0, 255),
+            thickness=thickness,
+            lineType=cv2.LINE_AA,
+        )
+
     def video_start(self, source):
         try:
             cap = cv2.VideoCapture(source)
             assert cap.isOpened(), "Error reading video file"
 
             while cap.isOpened():
-                success, frame = cap.read()
+                success, self.frame = cap.read()
                 if not success:
                     print("Video frame is empty or video processing has been successfully completed.")
                     break
+                
+                self.counting_person()
 
-                start_time = time.time()
-                frame = self.counter.count(frame)
-                stop_time = time.time()
-
-                self.processing_times.append(stop_time - start_time)
-
-                # Mean processing time [ms].
-                _, f_width = frame.shape[:2]
-                processing_time = np.mean(self.processing_times) * 1000
-                fps = 1000 / processing_time
-                cv2.putText(
-                    img=frame,
-                    text=f"Inference time: {processing_time:.1f}ms ({fps:.1f} FPS)",
-                    org=(20, 40),
-                    fontFace=cv2.FONT_HERSHEY_COMPLEX,
-                    fontScale=f_width / 1000,
-                    color=(0, 0, 255),
-                    thickness=2,
-                    lineType=cv2.LINE_AA,
-                )
-
-                # Get the counts. Counts are getting as 'OUT'
-                # Modify this logic accordingly
-                counts = self.counter.out_count
-
-                # Define the text to display
-                text = f"Count: {counts}"
-                fontFace = cv2.FONT_HERSHEY_COMPLEX
-                fontScale = 0.75  # Adjust scale as needed
-                thickness = 2
-
-                # Calculate the size of the text box
-                (text_width, text_height), _ = cv2.getTextSize(text, fontFace, fontScale, thickness)
-
-                # Define the upper right corner for the text
-                top_right_corner = (frame.shape[1] - text_width - 20, 40)
-                # Draw the count of "OUT" on the frame
-                cv2.putText(
-                    img=frame,
-                    text=text,
-                    org=(top_right_corner[0], top_right_corner[1]),
-                    fontFace=fontFace,
-                    fontScale=fontScale,
-                    color=(0, 0, 255),
-                    thickness=thickness,
-                    lineType=cv2.LINE_AA,
-                )
-
-                cv2.imshow("PersonCounter", frame)
+                cv2.imshow("PersonCounter", self.frame)
 
                 # q 키 누르면 종료
                 if cv2.waitKey(1) & 0xFF == ord('q'):
