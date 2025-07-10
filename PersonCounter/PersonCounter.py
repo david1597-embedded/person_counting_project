@@ -55,8 +55,9 @@ class PersonCounter:
 
         # === frame exist counter ===
         results = self.det_model(self.frame)
-        self.frame = results[0].plot()
 
+        self.frame = results[0].plot() #box
+        print(results[0])
         stop_time = time.time()
 
         self.processing_times.append(stop_time - start_time)
@@ -65,15 +66,7 @@ class PersonCounter:
         _, f_width = self.frame.shape[:2]
         processing_time = np.mean(self.processing_times) * 1000
         fps = 1000 / processing_time
-        cv2.putText(       processed_inputs = []
-        for arg in args:
-            if isinstance(arg, torch.Tensor):
-                processed_inputs.append(arg.detach().cpu().numpy())
-            else:
-                processed_inputs.append(arg)
-        result = self.compiled_model(processed_inputs)
-        # 결과가 numpy → torch로 되돌림 (CPU tensor)
-        return torch.from_numpy(result[0])
+        cv2.putText(
             img=self.frame,
             text=f"Inference time: {processing_time:.1f}ms ({fps:.1f} FPS)",
             org=(20, 40),
@@ -88,7 +81,7 @@ class PersonCounter:
         # Modify this logic accordingly
     
         # counts = self.counter.out_count
-        counts = sum(1 for c in results[0].boxes.cls if int(c) == 0)
+        counts = sum(1 for c in results[0].boxes.cls if int(c) == 0)#how many people in a single frame?
 
         # Define the text to display
         text = f"Count: {counts}"
@@ -105,7 +98,7 @@ class PersonCounter:
         cv2.putText(
             img=self.frame,
             text=text,
-            org=(top_right_corner[counting_person0], top_right_corner[1]),
+            org=(top_right_corner[0], top_right_corner[1]),
             fontFace=fontFace,
             fontScale=fontScale,
             color=(0, 0, 255),
