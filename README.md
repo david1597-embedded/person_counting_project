@@ -34,8 +34,6 @@
 ![alt text](./assets/video1.gif)
 
 최종적으로 프레임에 얼마나 많은 사람이 있는지를 바운딩박스의 영역을 계산하여 혼잡도를 계산했다.
-![alt text](./assets/video3.gif)
-
 
 
 ### 🚟최종 제공 기능
