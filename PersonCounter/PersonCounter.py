@@ -31,7 +31,7 @@ class PersonCounter:
         self.det_model.predictor.model.pt = False
 
     def infer(self, *args):
-         # OpenVINO는 numpy만 받음, torch.Tensor → numpy (CPU)
+        # OpenVINO는 numpy만 받음, torch.Tensor → numpy (CPU)
         processed_inputs = []
         for arg in args:
             if isinstance(arg, torch.Tensor):
@@ -83,6 +83,9 @@ class PersonCounter:
         # counts = self.counter.out_count
         counts = sum(1 for c in results[0].boxes.cls if int(c) == 0)#how many people in a single frame?
 
+        total_person_area = 0
+        frame_area = self.frame.shape[0] * self.frame.shape[1]
+
         # Define the text to display
         text = f"Count: {counts}"
         fontFace = cv2.FONT_HERSHEY_COMPLEX
@@ -94,6 +97,35 @@ class PersonCounter:
 
         # Define the upper right corner for the text
         top_right_corner = (self.frame.shape[1] - text_width - 20, 40)
+
+        for box, cls_id in zip(results[0].boxes.xyxy, results[0].boxes.cls):
+            if int(cls_id) == 0:  # class 0 = person
+                counts += 1
+                x1, y1, x2, y2 = map(int, box)
+                area = max((x2 - x1), 0) * max((y2 - y1), 0)
+                total_person_area += area
+
+        congestion_ratio = (total_person_area / frame_area) * 100  # %
+
+        text_count = f"Count: {counts}"
+        text_congestion = f"Congestion: {congestion_ratio:.1f}%"
+
+        # Count 표시
+        (tw, th), _ = cv2.getTextSize(text_count, cv2.FONT_HERSHEY_COMPLEX, 0.75, 2)
+        pos_x = self.frame.shape[1] - tw - 20
+        cv2.putText(
+            self.frame, text_count, (pos_x, 40),
+            cv2.FONT_HERSHEY_COMPLEX, 0.75, (0, 0, 255), 2, cv2.LINE_AA
+        )
+
+        # Congestion 표시
+        (tw2, th2), _ = cv2.getTextSize(text_congestion, cv2.FONT_HERSHEY_COMPLEX, 0.75, 2)
+        pos_x2 = self.frame.shape[1] - tw2 - 20
+        cv2.putText(
+            self.frame, text_congestion, (pos_x2, 80),
+            cv2.FONT_HERSHEY_COMPLEX, 0.75, (255, 0, 0), 2, cv2.LINE_AA
+        )
+
         # Draw the count of "OUT" on the frame
         cv2.putText(
             img=self.frame,
