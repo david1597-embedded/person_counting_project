@@ -13,7 +13,14 @@
 
 ## 프로젝트의 구성
 
-프로젝트는 인파를 파악하는 CCTV화면에서 실시간으로 혼잡도를 파악하는 GUI를 제공한다.  
 
+기본적으로 프로젝트는 OpenVINO 샘플들 중 [person-counting-webcam](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/person-counting-webcam)을 참고한다.
+예제는 화면에서 사람객체의 위치를 파악하고 특정 선을 넘어가는 사람의 수를 체크하고 이를 윈도우를 통해 보여주는 기능을 제공한다.
+
+
+![334729822-e0525f8a-4578-4c56-a0a5-ce68e30d2d45](https://github.com/user-attachments/assets/8038460d-a425-422a-9c7c-cf21291a3823)
+
+
+프로젝트에서 기본적으로 제공하는 기능을 삭제하고 프레임에 나타난 사람객체를 파악하고 객체의 수를 출력하는 기능으로 교체했다.
 
 ![video1](https://github.com/user-attachments/assets/7927c6a7-1f58-4b78-b057-8f2e1867607c)
