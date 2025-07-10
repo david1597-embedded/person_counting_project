@@ -31,7 +31,15 @@ class PersonCounter:
         self.det_model.predictor.model.pt = False
 
     def infer(self, *args):
-        result = self.compiled_model(args)
+         # OpenVINO는 numpy만 받음, torch.Tensor → numpy (CPU)
+        processed_inputs = []
+        for arg in args:
+            if isinstance(arg, torch.Tensor):
+                processed_inputs.append(arg.detach().cpu().numpy())
+            else:
+                processed_inputs.append(arg)
+        result = self.compiled_model(processed_inputs)
+        # 결과가 numpy → torch로 되돌림 (CPU tensor)
         return torch.from_numpy(result[0])
     
     def counter_setup(self):
@@ -57,7 +65,15 @@ class PersonCounter:
         _, f_width = self.frame.shape[:2]
         processing_time = np.mean(self.processing_times) * 1000
         fps = 1000 / processing_time
-        cv2.putText(
+        cv2.putText(       processed_inputs = []
+        for arg in args:
+            if isinstance(arg, torch.Tensor):
+                processed_inputs.append(arg.detach().cpu().numpy())
+            else:
+                processed_inputs.append(arg)
+        result = self.compiled_model(processed_inputs)
+        # 결과가 numpy → torch로 되돌림 (CPU tensor)
+        return torch.from_numpy(result[0])
             img=self.frame,
             text=f"Inference time: {processing_time:.1f}ms ({fps:.1f} FPS)",
             org=(20, 40),
@@ -89,7 +105,7 @@ class PersonCounter:
         cv2.putText(
             img=self.frame,
             text=text,
-            org=(top_right_corner[0], top_right_corner[1]),
+            org=(top_right_corner[counting_person0], top_right_corner[1]),
             fontFace=fontFace,
             fontScale=fontScale,
             color=(0, 0, 255),
