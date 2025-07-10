@@ -13,7 +13,6 @@ from download import download
 
 det_model, det_model_path = download()
 
-
 def run_inference(source, device):
     core = ov.Core()
 
@@ -111,7 +110,7 @@ def run_inference(source, device):
 
 from notebook_utils import download_file
 
-WEBCAM_INFERENCE = False
+WEBCAM_INFERENCE = True  # True : Webcam / False : .mp4
 
 VIDEO_SOURCE = None
 if WEBCAM_INFERENCE:
